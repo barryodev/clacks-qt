@@ -1,6 +1,9 @@
 #include "addfeeddialog.h"
 #include "ui_addfeeddialog.h"
 
+#include <QSqlQuery>
+#include <QSqlError>
+
 AddFeedDialog::AddFeedDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddFeedDialog)
@@ -15,6 +18,14 @@ AddFeedDialog::~AddFeedDialog()
 
 void AddFeedDialog::on_buttonAddFeed_accepted()
 {
+    QSqlQuery query;
+
+    query.prepare("INSERT INTO feeds (url) VALUES(:url)");
+    query.bindValue(":url", ui->feedURLInput->text());
+
+    if(!query.exec())
+        qWarning() << "MainWindow::DatabasePopulate - ERROR: " << query.lastError().text();
+
     accept();
 }
 

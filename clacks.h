@@ -19,8 +19,12 @@ public:
 private slots:
     void on_actionAddNewFeed_triggered();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::Clacks *ui;
     AddFeedDialog *feedDialog = 0;
+
+    void databaseConnect();
 };
 #endif // CLACKS_H

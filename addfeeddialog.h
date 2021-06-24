@@ -20,6 +20,9 @@ private slots:
 
     void on_buttonAddFeed_rejected();
 
+signals:
+    void sendSignal(QString);
+
 private:
     Ui::AddFeedDialog *ui;
 };

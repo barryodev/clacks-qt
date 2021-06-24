@@ -2,6 +2,7 @@
 #define CLACKS_H
 
 #include <QMainWindow>
+#include <QStringListModel>
 #include "addfeeddialog.h"
 
 QT_BEGIN_NAMESPACE
@@ -16,15 +17,18 @@ public:
     Clacks(QWidget *parent = nullptr);
     ~Clacks();
 
-private slots:
-    void on_actionAddNewFeed_triggered();
-
-    void on_pushButton_clicked();
-
 private:
     Ui::Clacks *ui;
     AddFeedDialog *feedDialog = 0;
-
+    QStringListModel *feedsModel;
     void databaseConnect();
+    void loadFeedList();
+
+public slots:
+    void receiveSlot(QString);
+
+private slots:
+    void on_actionAddNewFeed_triggered();
+
 };
 #endif // CLACKS_H

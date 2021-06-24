@@ -26,12 +26,14 @@ void AddFeedDialog::on_buttonAddFeed_accepted()
     if(!query.exec())
         qWarning() << "MainWindow::DatabasePopulate - ERROR: " << query.lastError().text();
 
-    accept();
+    emit sendSignal(ui->feedURLInput->text());
+
+    close();
 }
 
 
 void AddFeedDialog::on_buttonAddFeed_rejected()
 {
-    reject();
+    close();
 }
 

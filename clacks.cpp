@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QStandardPaths>
 #include <QDir>
+#include <QAbstractItemView>
 
 Clacks::Clacks(QWidget *parent)
     : QMainWindow(parent)
@@ -14,6 +15,7 @@ Clacks::Clacks(QWidget *parent)
 {
     ui->setupUi(this);
     databaseConnect();
+    loadFeedList();
 }
 
 void Clacks::databaseConnect() {
@@ -45,6 +47,22 @@ void Clacks::databaseConnect() {
     query.finish();
 }
 
+void Clacks::loadFeedList(){
+    feedsModel = new QStringListModel(this);
+
+    QStringList list;
+
+    QSqlQuery query("SELECT url FROM feeds");
+    while (query.next()) {
+        list.append(query.value(0).toString());
+    }
+
+    feedsModel->setStringList(list);
+    ui->feedsList->setModel(feedsModel);
+
+    ui->feedsList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
 Clacks::~Clacks()
 {
     {
@@ -55,28 +73,23 @@ Clacks::~Clacks()
 
     delete ui;
     delete feedDialog;
+    delete feedsModel;
 }
-
 
 void Clacks::on_actionAddNewFeed_triggered()
 {
     feedDialog = new AddFeedDialog(this);
+    connect(feedDialog, SIGNAL(sendSignal(QString)), this, SLOT(receiveSlot(QString)));
+    feedDialog->setAttribute(Qt::WA_DeleteOnClose);
     feedDialog->show();
 }
 
-
-void Clacks::on_pushButton_clicked()
+void Clacks::receiveSlot(QString feedURL)
 {
-    QSqlQuery query;
-    query.prepare("SELECT url FROM feeds ORDER BY ROWID DESC LIMIT 1");
-
-    if(!query.exec()) {
-        qWarning() << "MainWindow::on_pushButton_clicked - ERROR: " << query.lastError().text();
+    if(feedsModel) {
+        if(feedsModel->insertRow(feedsModel->rowCount())) {
+            QModelIndex index = feedsModel->index(feedsModel->rowCount() - 1, 0);
+            feedsModel->setData(index, feedURL);
+        }
     }
-    if(query.first()){
-        ui->databaseResult->setText(query.value(0).toString());
-    }
-    query.finish();
-
 }
-

@@ -35,6 +35,9 @@ set(PROJECT_SOURCES
         addfeeddialog.h
         addfeeddialog.cpp
         addfeeddialog.ui
+        removedialog.h
+        removedialog.cpp
+        removedialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -59,7 +59,6 @@ void Clacks::loadFeedList(){
 
     feedsModel->setStringList(list);
     ui->feedsList->setModel(feedsModel);
-
     ui->feedsList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
@@ -72,7 +71,6 @@ Clacks::~Clacks()
     QSqlDatabase::removeDatabase( QSqlDatabase::defaultConnection );
 
     delete ui;
-    delete feedDialog;
     delete feedsModel;
 }
 
@@ -93,3 +91,17 @@ void Clacks::receiveSlot(QString feedURL)
         }
     }
 }
+
+void Clacks::on_actionRemove_Feed_triggered()
+{
+    removeDialog = new RemoveDialog(this, feedsModel);
+    connect(removeDialog, SIGNAL(sendRemoveSignal(int)), this, SLOT(receiveRemoveSlot(int)));
+    removeDialog->setAttribute(Qt::WA_DeleteOnClose);
+    removeDialog->show();
+}
+
+void Clacks::receiveRemoveSlot(int removedIndex)
+{
+    feedsModel->removeRow(removedIndex);
+}
+

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStringListModel>
 #include "addfeeddialog.h"
+#include "removedialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Clacks; }
@@ -20,15 +21,17 @@ public:
 private:
     Ui::Clacks *ui;
     AddFeedDialog *feedDialog = 0;
+    RemoveDialog *removeDialog = 0;
     QStringListModel *feedsModel;
     void databaseConnect();
     void loadFeedList();
 
 public slots:
     void receiveSlot(QString);
+    void receiveRemoveSlot(int);
 
 private slots:
     void on_actionAddNewFeed_triggered();
-
+    void on_actionRemove_Feed_triggered();
 };
 #endif // CLACKS_H

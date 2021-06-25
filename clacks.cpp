@@ -77,12 +77,12 @@ Clacks::~Clacks()
 void Clacks::on_actionAddNewFeed_triggered()
 {
     feedDialog = new AddFeedDialog(this);
-    connect(feedDialog, SIGNAL(sendSignal(QString)), this, SLOT(receiveSlot(QString)));
+    connect(feedDialog, SIGNAL(sendAddSignal(QString)), this, SLOT(receiveAddSlot(QString)));
     feedDialog->setAttribute(Qt::WA_DeleteOnClose);
     feedDialog->show();
 }
 
-void Clacks::receiveSlot(QString feedURL)
+void Clacks::receiveAddSlot(QString feedURL)
 {
     if(feedsModel) {
         if(feedsModel->insertRow(feedsModel->rowCount())) {

@@ -27,7 +27,7 @@ private:
     void loadFeedList();
 
 public slots:
-    void receiveSlot(QString);
+    void receiveAddSlot(QString);
     void receiveRemoveSlot(int);
 
 private slots:

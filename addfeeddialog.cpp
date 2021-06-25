@@ -26,7 +26,7 @@ void AddFeedDialog::on_buttonAddFeed_accepted()
     if(!query.exec())
         qWarning() << "AddFeedDialog::on_buttonAddFeed_accepted - ERROR: " << query.lastError().text();
 
-    emit sendSignal(ui->feedURLInput->text());
+    emit sendAddSignal(ui->feedURLInput->text());
     close();
 }
 

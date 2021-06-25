@@ -38,6 +38,9 @@ set(PROJECT_SOURCES
         removedialog.h
         removedialog.cpp
         removedialog.ui
+        editdialog.h
+        editdialog.cpp
+        editdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

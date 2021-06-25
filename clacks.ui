@@ -35,6 +35,7 @@
     </property>
     <addaction name="actionAddNewFeed"/>
     <addaction name="actionRemove_Feed"/>
+    <addaction name="actionEdit_Feed"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -51,6 +52,7 @@
    </attribute>
    <addaction name="actionAddNewFeed"/>
    <addaction name="actionRemove_Feed"/>
+   <addaction name="actionEdit_Feed"/>
   </widget>
   <action name="actionAddNewFeed">
    <property name="text">
@@ -63,6 +65,11 @@
   <action name="actionRemove_Feed">
    <property name="text">
     <string>Remove Feed</string>
+   </property>
+  </action>
+  <action name="actionEdit_Feed">
+   <property name="text">
+    <string>Edit Feed</string>
    </property>
   </action>
  </widget>

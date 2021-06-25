@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QAbstractItemView>
+#include <QMessageBox>
 
 Clacks::Clacks(QWidget *parent)
     : QMainWindow(parent)
@@ -76,10 +77,10 @@ Clacks::~Clacks()
 
 void Clacks::on_actionAddNewFeed_triggered()
 {
-    feedDialog = new AddFeedDialog(this);
-    connect(feedDialog, SIGNAL(sendAddSignal(QString)), this, SLOT(receiveAddSlot(QString)));
-    feedDialog->setAttribute(Qt::WA_DeleteOnClose);
-    feedDialog->show();
+    addFeedDialog = new AddFeedDialog(this);
+    connect(addFeedDialog, SIGNAL(sendAddSignal(QString)), this, SLOT(receiveAddSlot(QString)));
+    addFeedDialog->setAttribute(Qt::WA_DeleteOnClose);
+    addFeedDialog->show();
 }
 
 void Clacks::receiveAddSlot(QString feedURL)
@@ -103,5 +104,25 @@ void Clacks::on_actionRemove_Feed_triggered()
 void Clacks::receiveRemoveSlot(int removedIndex)
 {
     feedsModel->removeRow(removedIndex);
+}
+
+
+void Clacks::on_actionEdit_Feed_triggered()
+{
+     if(ui->feedsList->selectionModel()->selectedIndexes().size() == 0) {
+        QMessageBox msgBox;
+        msgBox.setText("Select a feed you want to remove");
+        msgBox.exec();
+    } else {
+        editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
+        connect(editDialog, SIGNAL(sendEditSignal(int, QString)), this, SLOT(receiveEditSlot(int, QString)));
+        editDialog->setAttribute(Qt::WA_DeleteOnClose);
+        editDialog->show();
+    }
+}
+
+void Clacks::receiveEditSlot(int index, QString feedURL)
+{
+    feedsModel->setData(feedsModel->index(index, 0), feedURL);
 }
 

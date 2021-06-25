@@ -4,12 +4,14 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
-RemoveDialog::RemoveDialog(QWidget *parent, QStringListModel *feedsModel) :
+RemoveDialog::RemoveDialog(int indexModel, const QString &feedURL, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::RemoveDialog)
 {
     ui->setupUi(this);
-    ui->removeComboBox->setModel(feedsModel);
+    this->indexModel = indexModel;
+    this->feedURL = feedURL;
+    ui->labelFeedURL->setText(feedURL);
 }
 
 RemoveDialog::~RemoveDialog()
@@ -22,12 +24,12 @@ void RemoveDialog::on_buttonBox_accepted()
     QSqlQuery query;
 
     query.prepare("DELETE FROM feeds WHERE url = ?");
-    query.addBindValue(ui->removeComboBox->currentText());
+    query.addBindValue(feedURL);
 
     if(!query.exec())
         qWarning() << "RemoveDialog::on_buttonBox_accepted - ERROR: " << query.lastError().text();
 
-    emit sendRemoveSignal(ui->removeComboBox->currentIndex());
+    emit sendRemoveSignal(indexModel);
     close();
 }
 

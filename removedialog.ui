@@ -17,12 +17,16 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Select feed to remove:</string>
+      <string>Are you sure you want to remove this feed?</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="removeComboBox"/>
+    <widget class="QLabel" name="labelFeedURL">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

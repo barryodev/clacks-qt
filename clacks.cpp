@@ -95,11 +95,18 @@ void Clacks::receiveAddSlot(QString feedURL)
 
 void Clacks::on_actionRemove_Feed_triggered()
 {
-    removeDialog = new RemoveDialog(this, feedsModel);
-    connect(removeDialog, SIGNAL(sendRemoveSignal(int)), this, SLOT(receiveRemoveSlot(int)));
-    removeDialog->setAttribute(Qt::WA_DeleteOnClose);
-    removeDialog->show();
+    if(ui->feedsList->selectionModel()->selectedIndexes().size() == 0) {
+        QMessageBox msgBox;
+        msgBox.setText("Click on a feed in the list that you want to remove");
+        msgBox.exec();
+    } else {
+        removeDialog = new RemoveDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
+        connect(removeDialog, SIGNAL(sendRemoveSignal(int)), this, SLOT(receiveRemoveSlot(int)));
+        removeDialog->setAttribute(Qt::WA_DeleteOnClose);
+        removeDialog->show();
+    }
 }
+
 
 void Clacks::receiveRemoveSlot(int removedIndex)
 {
@@ -109,9 +116,9 @@ void Clacks::receiveRemoveSlot(int removedIndex)
 
 void Clacks::on_actionEdit_Feed_triggered()
 {
-     if(ui->feedsList->selectionModel()->selectedIndexes().size() == 0) {
+    if(ui->feedsList->selectionModel()->selectedIndexes().size() == 0) {
         QMessageBox msgBox;
-        msgBox.setText("Select a feed you want to remove");
+        msgBox.setText("Click on a feed in the list that you want to edit");
         msgBox.exec();
     } else {
         editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);

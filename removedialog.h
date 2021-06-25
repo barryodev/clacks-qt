@@ -13,7 +13,7 @@ class RemoveDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit RemoveDialog(QWidget *parent = nullptr, QStringListModel *feedsModel = nullptr);
+    explicit RemoveDialog(int indexModel = -1, const QString &feedURL = nullptr, QWidget *parent = nullptr);
     ~RemoveDialog();
 
 private slots:
@@ -25,6 +25,8 @@ signals:
 
 private:
     Ui::RemoveDialog *ui;
+    int indexModel;
+    QString feedURL;
 };
 
 #endif // REMOVEDIALOG_H

@@ -1,6 +1,7 @@
 #include "clacks.h"
 
 #include <QApplication>
+#include "feedloader.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,5 +9,9 @@ int main(int argc, char *argv[])
     a.setApplicationName("ClacksQT");
     Clacks w;
     w.show();
+
+    FeedLoader fl;
+    fl.downloadFeed(QUrl("https://www.example.com"));
+
     return a.exec();
 }

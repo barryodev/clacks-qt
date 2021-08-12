@@ -7,6 +7,10 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QDebug>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QDomNode>
+#include <QDomNodeList>
 
 class FeedLoader: public QObject
 {

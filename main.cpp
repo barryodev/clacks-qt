@@ -1,6 +1,7 @@
 #include "clacks.h"
 
 #include <QApplication>
+#include <QUrl>
 #include "feedloader.h"
 
 int main(int argc, char *argv[])
@@ -11,7 +12,7 @@ int main(int argc, char *argv[])
     w.show();
 
     FeedLoader fl;
-    fl.downloadFeed(QUrl("https://www.example.com"));
+    fl.downloadFeed(QUrl("https://barryodriscoll.net/feed/"));
 
     return a.exec();
 }

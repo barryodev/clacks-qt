@@ -18,6 +18,8 @@ void FeedLoader::downloadFeed(QUrl feedAddress)
 
 void FeedLoader::replyFinished (QNetworkReply *reply)
 {
+    QDomDocument doc("mydocument");
+
     if(reply->error())
     {
         qDebug() << "ERROR!";
@@ -30,8 +32,27 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
         qDebug() << reply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
         qDebug() << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         qDebug() << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
-        qDebug() << reply->readAll();
         qDebug() << QSslSocket::sslLibraryBuildVersionString();
+
+        if (!doc.setContent(reply->readAll())) {
+            qDebug() << "Failed To Parse Xml";
+            return;
+        } else {
+
+            QDomElement docElem = doc.documentElement();
+
+            QDomNode topTag = docElem.firstChild();
+            if(!topTag.isNull() && topTag.hasChildNodes()) {
+                QDomNodeList children = topTag.childNodes();
+
+                for(int i = 0; i < children.length() - 1; i++) {
+                    QDomElement childElement = children.at(i).toElement();
+                    if (!childElement.isNull()) {
+                        qDebug() << childElement.tagName() << " " << childElement.text();
+                    }
+                }
+            }
+        }
     }
 
     reply->deleteLater();

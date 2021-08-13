@@ -17,7 +17,6 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Sql Network Xml REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Sql Network Xml REQUIRED)
 
 set(PROJECT_SOURCES
-        main.h
         main.cpp
         clacks.cpp
         clacks.h

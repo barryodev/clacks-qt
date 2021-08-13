@@ -2,6 +2,8 @@
 #define ADDFEEDDIALOG_H
 
 #include <QDialog>
+#include <QSqlQuery>
+#include <QSqlError>
 
 namespace Ui {
 class AddFeedDialog;

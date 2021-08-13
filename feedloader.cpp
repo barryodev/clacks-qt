@@ -9,51 +9,48 @@ FeedLoader::FeedLoader(QObject *parent) :
 void FeedLoader::downloadFeed(QUrl feedAddress)
 {
     manager = new QNetworkAccessManager(this);
-
-    connect(manager, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(replyFinished(QNetworkReply*)));
-
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     manager->get(QNetworkRequest(feedAddress));
+
 }
 
 void FeedLoader::replyFinished (QNetworkReply *reply)
 {
     QDomDocument doc("mydocument");
+    QString result;
+
 
     if(reply->error())
     {
-        qDebug() << "ERROR!";
-        qDebug() << reply->errorString();
+        result = QString("Failed to download feed: ") + reply->errorString();
     }
     else
     {
-        qDebug() << reply->header(QNetworkRequest::ContentTypeHeader).toString();
-        qDebug() << reply->header(QNetworkRequest::LastModifiedHeader).toDateTime().toString();
-        qDebug() << reply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
-        qDebug() << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        qDebug() << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
-        qDebug() << QSslSocket::sslLibraryBuildVersionString();
+        QLatin1Char space(' ');
+        QLatin1String newline("<BR>");
 
         if (!doc.setContent(reply->readAll())) {
-            qDebug() << "Failed To Parse Xml";
-            return;
+            result = QString("Failed To Parse Xml");
         } else {
 
-            QDomElement docElem = doc.documentElement();
+            QDomElement topElem = doc.documentElement();
+            result += topElem.tagName() + space + topElem.text() + newline;
 
-            QDomNode topTag = docElem.firstChild();
+            QDomNode topTag = topElem.firstChild();
             if(!topTag.isNull() && topTag.hasChildNodes()) {
                 QDomNodeList children = topTag.childNodes();
 
                 for(int i = 0; i < children.length() - 1; i++) {
                     QDomElement childElement = children.at(i).toElement();
                     if (!childElement.isNull()) {
-                        qDebug() << childElement.tagName() << " " << childElement.text();
+                        result += childElement.tagName() + space + childElement.text() + newline;
                     }
                 }
             }
         }
     }
+
+    emit sendFeedSignal(result);
 
     reply->deleteLater();
 }

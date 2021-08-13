@@ -6,6 +6,7 @@
 #include "addfeeddialog.h"
 #include "removedialog.h"
 #include "editdialog.h"
+#include "feedloader.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Clacks; }
@@ -25,15 +26,19 @@ private:
     RemoveDialog *removeDialog = 0;
     EditDialog *editDialog = 0;
     QStringListModel *feedsModel;
+    FeedLoader *feedLoader;
     void databaseConnect();
     void loadFeedList();
+    void loadFeedIntoBrowser();
 
 public slots:
     void receiveAddSlot(QString);
     void receiveRemoveSlot(int);
     void receiveEditSlot(int, QString);
+    void recieveFeedLoaded(QString);
 
 private slots:
+    void on_feedsList_clicked(const QModelIndex &index);
     void on_actionAddNewFeed_triggered();
     void on_actionRemove_Feed_triggered();
     void on_actionEdit_Feed_triggered();

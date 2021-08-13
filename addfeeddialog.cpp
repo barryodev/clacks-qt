@@ -1,8 +1,6 @@
 #include "addfeeddialog.h"
 #include "ui_addfeeddialog.h"
 
-#include <QSqlQuery>
-#include <QSqlError>
 
 AddFeedDialog::AddFeedDialog(QWidget *parent) :
     QDialog(parent),

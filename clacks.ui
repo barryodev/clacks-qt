@@ -18,6 +18,9 @@
     <item>
      <widget class="QListView" name="feedsList"/>
     </item>
+    <item>
+     <widget class="QTextBrowser" name="feedEntryContents"/>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">

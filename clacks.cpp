@@ -15,6 +15,10 @@ Clacks::Clacks(QWidget *parent)
     , ui(new Ui::Clacks)
 {
     ui->setupUi(this);
+    feedLoader = new FeedLoader(this);
+    ui->feedEntryContents->setReadOnly(true);
+    ui->feedEntryContents->setOpenExternalLinks(true);
+    ui->feedEntryContents->setTextInteractionFlags(ui->feedEntryContents->textInteractionFlags() | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     databaseConnect();
     loadFeedList();
 }
@@ -73,6 +77,7 @@ Clacks::~Clacks()
 
     delete ui;
     delete feedsModel;
+    feedLoader->deleteLater();
 }
 
 void Clacks::on_actionAddNewFeed_triggered()
@@ -122,7 +127,7 @@ void Clacks::on_actionEdit_Feed_triggered()
         msgBox.exec();
     } else {
         editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
-        connect(editDialog, SIGNAL(sendEditSignal(int, QString)), this, SLOT(receiveEditSlot(int, QString)));
+        connect(editDialog, SIGNAL(sendEditSignal(int,QString)), this, SLOT(receiveEditSlot(int, QString)));
         editDialog->setAttribute(Qt::WA_DeleteOnClose);
         editDialog->show();
     }
@@ -131,5 +136,21 @@ void Clacks::on_actionEdit_Feed_triggered()
 void Clacks::receiveEditSlot(int index, QString feedURL)
 {
     feedsModel->setData(feedsModel->index(index, 0), feedURL);
+}
+
+
+void Clacks::on_feedsList_clicked(const QModelIndex &index)
+{
+
+    feedLoader->downloadFeed(QUrl(feedsModel->data(ui->feedsList->currentIndex()).toString()));
+
+    connect(feedLoader, SIGNAL(sendFeedSignal(QString)), this, SLOT(recieveFeedLoaded(QString)));
+
+    ui->feedEntryContents->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
+
+}
+
+void Clacks::recieveFeedLoaded(QString feedData) {
+    ui->feedEntryContents->setHtml(feedData);
 }
 

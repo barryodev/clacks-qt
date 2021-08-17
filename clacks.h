@@ -3,10 +3,13 @@
 
 #include <QMainWindow>
 #include <QStringListModel>
+#include <QMap>
+#include <QString>
 #include "addfeeddialog.h"
 #include "removedialog.h"
 #include "editdialog.h"
 #include "feedloader.h"
+#include "feed.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Clacks; }
@@ -27,6 +30,7 @@ private:
     EditDialog *editDialog = 0;
     QStringListModel *feedsModel;
     FeedLoader *feedLoader;
+    QMap<QString, Feed> allFeeds;
     void databaseConnect();
     void loadFeedList();
     void loadFeedIntoBrowser();
@@ -35,7 +39,7 @@ public slots:
     void receiveAddSlot(QString);
     void receiveRemoveSlot(int);
     void receiveEditSlot(int, QString);
-    void recieveFeedLoaded(QString);
+    void recieveFeedLoaded(bool, QString, Feed);
 
 private slots:
     void on_feedsList_clicked(const QModelIndex &index);

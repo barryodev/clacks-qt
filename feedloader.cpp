@@ -16,41 +16,114 @@ void FeedLoader::downloadFeed(QUrl feedAddress)
 
 void FeedLoader::replyFinished (QNetworkReply *reply)
 {
-    QDomDocument doc("mydocument");
-    QString result;
+    QDomDocument doc("feedXml");
+    bool error = false;
+    QString errorMessage;
+    Feed newFeed;
 
 
     if(reply->error())
     {
-        result = QString("Failed to download feed: ") + reply->errorString();
+        error = true;
+        errorMessage = QString("Failed to download feed: ") + reply->errorString();
     }
     else
     {
-        QLatin1Char space(' ');
-        QLatin1String newline("<BR>");
 
         if (!doc.setContent(reply->readAll())) {
-            result = QString("Failed To Parse Xml");
+            error = true;
+            errorMessage = QString("Failed To Parse Xml");
         } else {
-
-            QDomElement topElem = doc.documentElement();
-            result += topElem.tagName() + space + topElem.text() + newline;
-
-            QDomNode topTag = topElem.firstChild();
-            if(!topTag.isNull() && topTag.hasChildNodes()) {
-                QDomNodeList children = topTag.childNodes();
-
-                for(int i = 0; i < children.length() - 1; i++) {
-                    QDomElement childElement = children.at(i).toElement();
-                    if (!childElement.isNull()) {
-                        result += childElement.tagName() + space + childElement.text() + newline;
-                    }
-                }
+            errorMessage = "";
+            try {
+                QString title = parseTitle(doc);
+                newFeed.setTitle(title);
+            }  catch (std::runtime_error) {
+                error = true;
+                errorMessage = QString("Failed To Parse Xml");
             }
         }
     }
 
-    emit sendFeedSignal(result);
+    emit sendFeedSignal(error, errorMessage, newFeed);
 
     reply->deleteLater();
+}
+
+QDomElement FeedLoader::findChildElementByTag(QString tagName, QDomElement rootElement)
+{
+    QDomElement result;
+
+    for(QDomNode childNode = rootElement.firstChild(); !childNode.isNull(); childNode = childNode.nextSibling())
+    {
+        if (childNode.isElement()) {
+            QDomElement childAsElement = childNode.toElement();
+            if(QString::compare(childAsElement.tagName(), tagName, Qt::CaseInsensitive) == 0) {
+                result = childAsElement;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
+QString FeedLoader::parseTitle(QDomDocument xmlFeed)
+{
+    QString title = "";
+    QDomElement rootElement = xmlFeed.documentElement();
+    switch (getFeedType(xmlFeed)) {
+    case atom:
+    {
+        QDomElement titleNode = findChildElementByTag("title", rootElement);
+        title = titleNode.text();
+        break;
+    }
+    case rss:
+    {
+        QDomElement channelNode = findChildElementByTag("channel", rootElement);
+        QDomElement titleNode = findChildElementByTag("title", channelNode);
+        title = titleNode.text();
+        if(QString::compare(title, "") == 0){
+            QDomElement titleNode = findChildElementByTag("dc:title", channelNode);
+            title = titleNode.text();
+        }
+        break;
+    }
+    case rss_rdf:
+        QDomElement channelNode = findChildElementByTag("channel", rootElement);
+        QDomElement titleNode = findChildElementByTag("title", channelNode);
+        title = titleNode.text();
+        if(QString::compare(title, "") == 0){
+            QDomElement titleNode = findChildElementByTag("dc:title", channelNode);
+            title = titleNode.text();
+        }
+        break;
+    }
+    if(QString::compare(title, "") == 0){
+        throw std::runtime_error("Failed to Parse Xml");
+    }
+
+    return title;
+
+}
+
+FeedType FeedLoader::getFeedType(QDomDocument xmlFeed) {
+    QDomElement rootElement = xmlFeed.documentElement();
+    if(rootElement.isNull()) {
+        throw std::runtime_error("Failed to Parse Xml");
+    }
+
+    if(rootElement.tagName() == "feed") {
+        //atom
+        return atom;
+    } else if(rootElement.tagName() == "rss") {
+        //rss 0.91+
+        return rss;
+    } else if(rootElement.tagName() == "rdf:RDF") {
+        //rss 0.90
+        return rss_rdf;
+    } else {
+        //top element not recognised
+        throw std::runtime_error("Failed to Parse Xml");
+    }
 }

@@ -144,13 +144,17 @@ void Clacks::on_feedsList_clicked(const QModelIndex &index)
 
     feedLoader->downloadFeed(QUrl(feedsModel->data(ui->feedsList->currentIndex()).toString()));
 
-    connect(feedLoader, SIGNAL(sendFeedSignal(QString)), this, SLOT(recieveFeedLoaded(QString)));
+    connect(feedLoader, SIGNAL(sendFeedSignal(bool, QString, Feed)), this, SLOT(recieveFeedLoaded(bool, QString, Feed)));
 
     ui->feedEntryContents->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
 
 }
 
-void Clacks::recieveFeedLoaded(QString feedData) {
-    ui->feedEntryContents->setHtml(feedData);
+void Clacks::recieveFeedLoaded(bool error, QString errorString, Feed feed) {
+    if(error) {
+        ui->feedEntryContents->setHtml(errorString);
+    } else {
+        ui->feedEntryContents->setHtml(feed.getTitle());
+    }
 }
 

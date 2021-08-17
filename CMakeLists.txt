@@ -32,6 +32,10 @@ set(PROJECT_SOURCES
         editdialog.ui
         feedloader.h
         feedloader.cpp
+        feed.h
+        feed.cpp
+        entry.h
+        entry.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

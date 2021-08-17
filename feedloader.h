@@ -12,6 +12,10 @@
 #include <QDomNodeList>
 #include <QLatin1String>
 #include <QLatin1Char>
+#include <stdexcept>
+#include "feed.h"
+
+enum FeedType { atom, rss, rss_rdf };
 
 class FeedLoader: public QObject
 {
@@ -21,13 +25,16 @@ public:
     void downloadFeed(QUrl feedAddress);
 
 signals:
-    void sendFeedSignal(QString);
+    void sendFeedSignal(bool, QString, Feed);
 
 public slots:
     void replyFinished (QNetworkReply *reply);
 
 private:
-   QNetworkAccessManager *manager;
+    QString parseTitle(QDomDocument);
+    FeedType getFeedType(QDomDocument xmlFeed);
+    QNetworkAccessManager *manager;
+    QDomElement findChildElementByTag(QString tag, QDomElement elementToSearch);
 };
 
 #endif // FEEDLOADER_H

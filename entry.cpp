@@ -1,9 +1,9 @@
 #include "entry.h"
 
-Entry::Entry(QString title, QString description, QUrl source)
+Entry::Entry(QString title, QString content, QUrl source)
 {
     this->title = title;
-    this->description = description;
+    this->content = content;
     this->source = source;
 }
 
@@ -12,9 +12,9 @@ QString Entry::getTitle()
     return title;
 }
 
-QString Entry::getDescription()
+QString Entry::getContent()
 {
-    return description;
+    return content;
 }
 
 QUrl Entry::getSource()

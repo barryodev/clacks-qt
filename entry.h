@@ -7,13 +7,13 @@
 class Entry
 {
 public:
-    Entry(QString title, QString description, QUrl source);
+    Entry(QString title, QString content, QUrl source);
     QString getTitle();
-    QString getDescription();
+    QString getContent();
     QUrl getSource();
 
 private:
-    QString title, description;
+    QString title, content;
     QUrl source;
 
 };

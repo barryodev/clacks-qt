@@ -10,10 +10,10 @@
 #include <QDomElement>
 #include <QDomNode>
 #include <QDomNodeList>
-#include <QLatin1String>
-#include <QLatin1Char>
+#include <QDomNodeList>
 #include <stdexcept>
 #include "feed.h"
+#include "entry.h"
 
 enum FeedType { atom, rss, rss_rdf };
 
@@ -32,6 +32,7 @@ public slots:
 
 private:
     QString parseTitle(QDomDocument);
+    QList<Entry*> parseEntries(QDomDocument);
     FeedType getFeedType(QDomDocument xmlFeed);
     QNetworkAccessManager *manager;
     QDomElement findChildElementByTag(QString tag, QDomElement elementToSearch);

@@ -21,7 +21,6 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
     QString errorMessage;
     Feed newFeed;
 
-
     if(reply->error())
     {
         error = true;
@@ -38,6 +37,7 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
             try {
                 QString title = parseTitle(doc);
                 newFeed.setTitle(title);
+                newFeed.setEntries(parseEntries(doc));
             }  catch (std::runtime_error) {
                 error = true;
                 errorMessage = QString("Failed To Parse Xml");
@@ -48,23 +48,6 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
     emit sendFeedSignal(error, errorMessage, newFeed);
 
     reply->deleteLater();
-}
-
-QDomElement FeedLoader::findChildElementByTag(QString tagName, QDomElement rootElement)
-{
-    QDomElement result;
-
-    for(QDomNode childNode = rootElement.firstChild(); !childNode.isNull(); childNode = childNode.nextSibling())
-    {
-        if (childNode.isElement()) {
-            QDomElement childAsElement = childNode.toElement();
-            if(QString::compare(childAsElement.tagName(), tagName, Qt::CaseInsensitive) == 0) {
-                result = childAsElement;
-                break;
-            }
-        }
-    }
-    return result;
 }
 
 QString FeedLoader::parseTitle(QDomDocument xmlFeed)
@@ -78,7 +61,7 @@ QString FeedLoader::parseTitle(QDomDocument xmlFeed)
         title = titleNode.text();
         break;
     }
-    case rss:
+    case rss: case rss_rdf:
     {
         QDomElement channelNode = findChildElementByTag("channel", rootElement);
         QDomElement titleNode = findChildElementByTag("title", channelNode);
@@ -89,15 +72,6 @@ QString FeedLoader::parseTitle(QDomDocument xmlFeed)
         }
         break;
     }
-    case rss_rdf:
-        QDomElement channelNode = findChildElementByTag("channel", rootElement);
-        QDomElement titleNode = findChildElementByTag("title", channelNode);
-        title = titleNode.text();
-        if(QString::compare(title, "") == 0){
-            QDomElement titleNode = findChildElementByTag("dc:title", channelNode);
-            title = titleNode.text();
-        }
-        break;
     }
     if(QString::compare(title, "") == 0){
         throw std::runtime_error("Failed to Parse Xml");
@@ -107,7 +81,57 @@ QString FeedLoader::parseTitle(QDomDocument xmlFeed)
 
 }
 
-FeedType FeedLoader::getFeedType(QDomDocument xmlFeed) {
+QList<Entry*> FeedLoader::parseEntries(QDomDocument xmlFeed)
+{
+    QList<Entry*> allEntries = QList<Entry*>();
+    switch (getFeedType(xmlFeed)) {
+    case atom:
+    {
+        QDomNodeList entryList = xmlFeed.elementsByTagName("entry");
+        for(int x = 0; x < entryList.size() - 1; x++) {
+            QDomNode currentNode = entryList.item(x);
+            if(currentNode.isElement() && !currentNode.isNull()) {
+
+              QString title = findChildElementByTag("title", currentNode.toElement()).text();
+              QString content = findChildElementByTag("content", currentNode.toElement()).text();
+              QDomElement linkElement = findChildElementByTag("link", currentNode.toElement());
+              QString source = linkElement.attribute("href");
+
+              Entry* newEntry = new Entry(title, content, QUrl(source));
+              allEntries.append(newEntry);
+            }
+        }
+        break;
+    }
+    case rss: case rss_rdf:
+    {
+        QDomNodeList itemList = xmlFeed.elementsByTagName("item");
+        for(int x = 0; x < itemList.size() - 1; x++) {
+            QDomNode currentNode = itemList.item(x);
+            if(currentNode.isElement() && !currentNode.isNull()) {
+                QString title = findChildElementByTag("title", currentNode.toElement()).text();
+                if(QString::compare(title, "") == 0) {
+                    title = findChildElementByTag("dc:title", currentNode.toElement()).text();
+                }
+
+                QString content = findChildElementByTag("content:encoded", currentNode.toElement()).text();
+
+                QString source = findChildElementByTag("link", currentNode.toElement()).text();
+
+                Entry* newEntry = new Entry(title, content, QUrl(source));
+                allEntries.append(newEntry);
+            }
+        }
+        break;
+    }
+
+    }
+
+    return allEntries;
+}
+
+FeedType FeedLoader::getFeedType(QDomDocument xmlFeed)
+{
     QDomElement rootElement = xmlFeed.documentElement();
     if(rootElement.isNull()) {
         throw std::runtime_error("Failed to Parse Xml");
@@ -126,4 +150,22 @@ FeedType FeedLoader::getFeedType(QDomDocument xmlFeed) {
         //top element not recognised
         throw std::runtime_error("Failed to Parse Xml");
     }
+}
+
+
+QDomElement FeedLoader::findChildElementByTag(QString tagName, QDomElement rootElement)
+{
+    QDomElement result;
+
+    for(QDomNode childNode = rootElement.firstChild(); !childNode.isNull(); childNode = childNode.nextSibling())
+    {
+        if (childNode.isElement()) {
+            QDomElement childAsElement = childNode.toElement();
+            if(QString::compare(childAsElement.tagName(), tagName, Qt::CaseInsensitive) == 0) {
+                result = childAsElement;
+                break;
+            }
+        }
+    }
+    return result;
 }

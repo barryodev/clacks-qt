@@ -2,14 +2,16 @@
 #define FEED_H
 #include <QList>
 #include <QUrl>
-#include "Entry.h"
+#include <QStringList>
+#include "entry.h"
 
 class Feed
 {
 public:
     Feed();
-    void addEntry(Entry* newEntry);
+    void setEntries(QList<Entry*>);
     QList<Entry*> getEntries();
+    QStringList getEntryTitles();
     QString getTitle();
     void setTitle(QString title);
     QUrl getSource();

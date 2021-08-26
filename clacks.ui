@@ -14,12 +14,19 @@
    <string>Clacks</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QListView" name="feedsList"/>
     </item>
     <item>
-     <widget class="QTextBrowser" name="feedEntryContents"/>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QListView" name="entryList"/>
+      </item>
+      <item>
+       <widget class="QTextBrowser" name="feedEntryContents"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

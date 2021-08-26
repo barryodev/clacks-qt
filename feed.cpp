@@ -2,17 +2,28 @@
 
 Feed::Feed()
 {
-    this->entries = QList<Entry*>(20);
+
 }
 
-void Feed::addEntry(Entry* newEntry)
+void Feed::setEntries(QList<Entry*> entries)
 {
-    this->entries.append(newEntry);
+    this->entries = entries;
 }
 
 QList<Entry*> Feed::getEntries()
 {
     return entries;
+}
+
+QStringList Feed::getEntryTitles()
+{
+    QStringList entryTitles;
+
+    for(int x = 0; x < entries.size() - 1; x++) {
+        entryTitles.append(entries.at(x)->getTitle());
+    }
+
+    return entryTitles;
 }
 
 QString Feed::getTitle()

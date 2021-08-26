@@ -77,6 +77,7 @@ Clacks::~Clacks()
 
     delete ui;
     delete feedsModel;
+    delete entryList;
     feedLoader->deleteLater();
 }
 
@@ -127,7 +128,7 @@ void Clacks::on_actionEdit_Feed_triggered()
         msgBox.exec();
     } else {
         editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
-        connect(editDialog, SIGNAL(sendEditSignal(int,QString)), this, SLOT(receiveEditSlot(int, QString)));
+        connect(editDialog, SIGNAL(sendEditSignal(int,QString)), this, SLOT(receiveEditSlot(int,QString)));
         editDialog->setAttribute(Qt::WA_DeleteOnClose);
         editDialog->show();
     }
@@ -144,7 +145,7 @@ void Clacks::on_feedsList_clicked(const QModelIndex &index)
 
     feedLoader->downloadFeed(QUrl(feedsModel->data(ui->feedsList->currentIndex()).toString()));
 
-    connect(feedLoader, SIGNAL(sendFeedSignal(bool, QString, Feed)), this, SLOT(recieveFeedLoaded(bool, QString, Feed)));
+    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(recieveFeedLoaded(bool,QString,Feed)));
 
     ui->feedEntryContents->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
 
@@ -155,6 +156,17 @@ void Clacks::recieveFeedLoaded(bool error, QString errorString, Feed feed) {
         ui->feedEntryContents->setHtml(errorString);
     } else {
         ui->feedEntryContents->setHtml(feed.getTitle());
+
+        if(entryList) {
+            delete entryList;
+        }
+
+        QStringListModel *entryList = new QStringListModel(this);
+
+        entryList->setStringList(feed.getEntryTitles());
+
+        ui->entryList->setModel(entryList);
+
     }
 }
 

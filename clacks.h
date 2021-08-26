@@ -29,6 +29,7 @@ private:
     RemoveDialog *removeDialog = 0;
     EditDialog *editDialog = 0;
     QStringListModel *feedsModel;
+    QStringListModel *entryList = 0;
     FeedLoader *feedLoader;
     QMap<QString, Feed> allFeeds;
     void databaseConnect();

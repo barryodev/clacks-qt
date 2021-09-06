@@ -5,6 +5,7 @@
 #include <QStringListModel>
 #include <QMap>
 #include <QString>
+#include <QStandardItemModel>
 #include "addfeeddialog.h"
 #include "removedialog.h"
 #include "editdialog.h"
@@ -29,7 +30,7 @@ private:
     RemoveDialog *removeDialog = 0;
     EditDialog *editDialog = 0;
     QStringListModel *feedsModel;
-    QStringListModel *entryList = 0;
+    QStandardItemModel *entryModel = 0;
     FeedLoader *feedLoader;
     QMap<QString, Feed> allFeeds;
     void databaseConnect();
@@ -40,7 +41,8 @@ public slots:
     void receiveAddSlot(QString);
     void receiveRemoveSlot(int);
     void receiveEditSlot(int, QString);
-    void recieveFeedLoaded(bool, QString, Feed);
+    void receiveFeedLoaded(bool, QString, Feed);
+    void entryClicked(const QModelIndex &index);
 
 private slots:
     void on_feedsList_clicked(const QModelIndex &index);

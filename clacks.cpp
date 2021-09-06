@@ -16,9 +16,9 @@ Clacks::Clacks(QWidget *parent)
 {
     ui->setupUi(this);
     feedLoader = new FeedLoader(this);
-    ui->feedEntryContents->setReadOnly(true);
-    ui->feedEntryContents->setOpenExternalLinks(true);
-    ui->feedEntryContents->setTextInteractionFlags(ui->feedEntryContents->textInteractionFlags() | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    ui->entryText->setReadOnly(true);
+    ui->entryText->setOpenExternalLinks(true);
+    ui->entryText->setTextInteractionFlags(ui->entryText->textInteractionFlags() | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     databaseConnect();
     loadFeedList();
 }
@@ -77,7 +77,7 @@ Clacks::~Clacks()
 
     delete ui;
     delete feedsModel;
-    delete entryList;
+    delete entryModel;
     feedLoader->deleteLater();
 }
 
@@ -145,28 +145,50 @@ void Clacks::on_feedsList_clicked(const QModelIndex &index)
 
     feedLoader->downloadFeed(QUrl(feedsModel->data(ui->feedsList->currentIndex()).toString()));
 
-    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(recieveFeedLoaded(bool,QString,Feed)));
+    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(receiveFeedLoaded(bool,QString,Feed)));
 
-    ui->feedEntryContents->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
+    ui->entryText->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
 
 }
 
-void Clacks::recieveFeedLoaded(bool error, QString errorString, Feed feed) {
+void Clacks::receiveFeedLoaded(bool error, QString errorString, Feed feed) {
     if(error) {
-        ui->feedEntryContents->setHtml(errorString);
+        ui->entryText->setHtml(errorString);
     } else {
-        ui->feedEntryContents->setHtml(feed.getTitle());
+        ui->entryText->setHtml(feed.getTitle());
 
-        if(entryList) {
-            delete entryList;
+        if(entryModel) {
+            delete entryModel;
         }
 
-        QStringListModel *entryList = new QStringListModel(this);
+        entryModel = new QStandardItemModel();
 
-        entryList->setStringList(feed.getEntryTitles());
+        QList entries = feed.getEntries();
 
-        ui->entryList->setModel(entryList);
+        for(int i = 0; i < entries.count(); i++) {
+            QVariant variantWrapper = QVariant::fromValue(*entries.at(i));
 
+            QStandardItem *item = new QStandardItem(entries.at(i)->getTitle());
+            item->setData(variantWrapper, Qt::UserRole);
+
+            entryModel->setItem(i, item);
+        }
+
+        ui->entryList->setModel(entryModel);
+        connect(ui->entryList, &QListView::clicked, this, &Clacks::entryClicked);
+
+    }
+}
+
+void Clacks::entryClicked(const QModelIndex &index)
+{
+    QStandardItem *item = entryModel->itemFromIndex(index);
+
+    if(item != nullptr) {
+        QVariant variantWrapper = item->data(Qt::UserRole);
+        Entry clickedEntry = variantWrapper.value<Entry>();
+
+        ui->entryText->setHtml(clickedEntry.getContent());
     }
 }
 

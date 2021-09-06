@@ -116,6 +116,14 @@ QList<Entry*> FeedLoader::parseEntries(QDomDocument xmlFeed)
 
                 QString content = findChildElementByTag("content:encoded", currentNode.toElement()).text();
 
+                if(QString::compare(content, "") == 0) {
+                    content = findChildElementByTag("description", currentNode.toElement()).text();
+
+                    if(QString::compare(content, "") == 0) {
+                        content = findChildElementByTag("dc:description", currentNode.toElement()).text();
+                    }
+                }
+
                 QString source = findChildElementByTag("link", currentNode.toElement()).text();
 
                 Entry* newEntry = new Entry(title, content, QUrl(source));

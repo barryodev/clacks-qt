@@ -24,7 +24,7 @@
        <widget class="QListView" name="entryList"/>
       </item>
       <item>
-       <widget class="QTextBrowser" name="feedEntryContents"/>
+       <widget class="QTextBrowser" name="entryText"/>
       </item>
      </layout>
     </item>

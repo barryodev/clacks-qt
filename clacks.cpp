@@ -52,9 +52,7 @@ void Clacks::databaseConnect() {
     query.finish();
 }
 
-void Clacks::loadFeedList(){
-    feedsModel = new QStringListModel(this);
-
+void Clacks::loadFeedList() {
     QStringList list;
 
     QSqlQuery query("SELECT url FROM feeds");
@@ -62,10 +60,20 @@ void Clacks::loadFeedList(){
         list.append(query.value(0).toString());
     }
 
-    feedsModel->setStringList(list);
-    ui->feedsList->setModel(feedsModel);
+    for(int i = 0; i < list.count(); i++) {
+        feedStore.addFeed(i, list.at(i));
+    }
+
+    for(int i = 0; i < list.count(); i++) {
+        feedLoader->downloadFeed(QUrl(list.at(i)));
+        connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(receiveFeedLoaded(bool,QString,Feed)));
+    }
+
+    ui->feedsList->setModel(feedStore.getModel());
     ui->feedsList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
+
+
 
 Clacks::~Clacks()
 {
@@ -76,7 +84,6 @@ Clacks::~Clacks()
     QSqlDatabase::removeDatabase( QSqlDatabase::defaultConnection );
 
     delete ui;
-    delete feedsModel;
     delete entryModel;
     feedLoader->deleteLater();
 }
@@ -91,12 +98,10 @@ void Clacks::on_actionAddNewFeed_triggered()
 
 void Clacks::receiveAddSlot(QString feedURL)
 {
-    if(feedsModel) {
-        if(feedsModel->insertRow(feedsModel->rowCount())) {
-            QModelIndex index = feedsModel->index(feedsModel->rowCount() - 1, 0);
-            feedsModel->setData(index, feedURL);
-        }
-    }
+    feedStore.addFeed(feedURL);
+
+    feedLoader->downloadFeed(QUrl(feedURL));
+    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(receiveFeedLoaded(bool,QString,Feed)));
 }
 
 void Clacks::on_actionRemove_Feed_triggered()
@@ -106,7 +111,8 @@ void Clacks::on_actionRemove_Feed_triggered()
         msgBox.setText("Click on a feed in the list that you want to remove");
         msgBox.exec();
     } else {
-        removeDialog = new RemoveDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
+
+        removeDialog = new RemoveDialog(ui->feedsList->currentIndex().row(), feedStore.getSource(ui->feedsList->currentIndex()), this);
         connect(removeDialog, SIGNAL(sendRemoveSignal(int)), this, SLOT(receiveRemoveSlot(int)));
         removeDialog->setAttribute(Qt::WA_DeleteOnClose);
         removeDialog->show();
@@ -116,7 +122,7 @@ void Clacks::on_actionRemove_Feed_triggered()
 
 void Clacks::receiveRemoveSlot(int removedIndex)
 {
-    feedsModel->removeRow(removedIndex);
+    feedStore.removeFeed(removedIndex);
 }
 
 
@@ -127,7 +133,7 @@ void Clacks::on_actionEdit_Feed_triggered()
         msgBox.setText("Click on a feed in the list that you want to edit");
         msgBox.exec();
     } else {
-        editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedsModel->data(ui->feedsList->currentIndex()).toString(), this);
+        editDialog = new EditDialog(ui->feedsList->currentIndex().row(), feedStore.getSource(ui->feedsList->currentIndex()), this);
         connect(editDialog, SIGNAL(sendEditSignal(int,QString)), this, SLOT(receiveEditSlot(int,QString)));
         editDialog->setAttribute(Qt::WA_DeleteOnClose);
         editDialog->show();
@@ -136,49 +142,61 @@ void Clacks::on_actionEdit_Feed_triggered()
 
 void Clacks::receiveEditSlot(int index, QString feedURL)
 {
-    feedsModel->setData(feedsModel->index(index, 0), feedURL);
+    feedStore.addFeed(index, feedURL);
+
+    feedLoader->downloadFeed(QUrl(feedURL));
+    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(receiveFeedLoaded(bool,QString,Feed)));
 }
 
 
+void Clacks::displayEntries(Feed feed)
+{
+    if(entryModel != nullptr) {
+        delete entryModel;
+    }
+
+    entryModel = new QStandardItemModel();
+
+    QList<Entry*> entries = feed.getEntries();
+
+    for(int i = 0; i < entries.count(); i++) {
+        QVariant variantWrapper = QVariant::fromValue(*entries.at(i));
+
+        QStandardItem *item = new QStandardItem(entries.at(i)->getTitle());
+        item->setData(variantWrapper, Qt::UserRole);
+
+        entryModel->setItem(i, item);
+    }
+
+    ui->entryList->setModel(entryModel);
+    connect(ui->entryList, &QListView::clicked, this, &Clacks::entryClicked);
+
+    if(entries.count() > 1) {
+        ui->entryText->setHtml(entries.at(0)->getContent());
+    }
+}
+
 void Clacks::on_feedsList_clicked(const QModelIndex &index)
 {
-
-    feedLoader->downloadFeed(QUrl(feedsModel->data(ui->feedsList->currentIndex()).toString()));
-
-    connect(feedLoader, SIGNAL(sendFeedSignal(bool,QString,Feed)), this, SLOT(receiveFeedLoaded(bool,QString,Feed)));
-
-    ui->entryText->setText(feedsModel->data(ui->feedsList->currentIndex()).toString());
-
+    ui->entryText->setHtml("");
+    Feed feed = feedStore.getFeed(index);
+    displayEntries(feed);
 }
 
 void Clacks::receiveFeedLoaded(bool error, QString errorString, Feed feed) {
     if(error) {
-        ui->entryText->setHtml(errorString);
-    } else {
-        ui->entryText->setHtml(feed.getTitle());
-
-        if(entryModel) {
-            delete entryModel;
-        }
-
-        entryModel = new QStandardItemModel();
-
-        QList entries = feed.getEntries();
-
-        for(int i = 0; i < entries.count(); i++) {
-            QVariant variantWrapper = QVariant::fromValue(*entries.at(i));
-
-            QStandardItem *item = new QStandardItem(entries.at(i)->getTitle());
-            item->setData(variantWrapper, Qt::UserRole);
-
-            entryModel->setItem(i, item);
-        }
-
-        ui->entryList->setModel(entryModel);
-        connect(ui->entryList, &QListView::clicked, this, &Clacks::entryClicked);
-
+        feed.setTitle("Error: " + feed.getSource().toString());
+        Entry *entry = new Entry(errorString, "", QUrl(""));
+        QList<Entry*> list;
+        list.append(entry);
+        feed.setEntries(list);
+    }
+    int indexReplaced = feedStore.updateFeed(feed);
+    if(indexReplaced == 0) {
+        displayEntries(feed);
     }
 }
+
 
 void Clacks::entryClicked(const QModelIndex &index)
 {

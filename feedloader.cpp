@@ -20,6 +20,7 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
     bool error = false;
     QString errorMessage;
     Feed newFeed;
+    newFeed.setSource(reply->url());
 
     if(reply->error())
     {
@@ -28,7 +29,6 @@ void FeedLoader::replyFinished (QNetworkReply *reply)
     }
     else
     {
-
         if (!doc.setContent(reply->readAll())) {
             error = true;
             errorMessage = QString("Failed To Parse Xml");
@@ -66,7 +66,7 @@ QString FeedLoader::parseTitle(QDomDocument xmlFeed)
         QDomElement channelNode = findChildElementByTag("channel", rootElement);
         QDomElement titleNode = findChildElementByTag("title", channelNode);
         title = titleNode.text();
-        if(QString::compare(title, "") == 0){
+        if(QString::compare(title, "") == 0) {
             QDomElement titleNode = findChildElementByTag("dc:title", channelNode);
             title = titleNode.text();
         }
@@ -88,7 +88,7 @@ QList<Entry*> FeedLoader::parseEntries(QDomDocument xmlFeed)
     case atom:
     {
         QDomNodeList entryList = xmlFeed.elementsByTagName("entry");
-        for(int x = 0; x < entryList.size() - 1; x++) {
+        for(int x = 0; x < entryList.size(); x++) {
             QDomNode currentNode = entryList.item(x);
             if(currentNode.isElement() && !currentNode.isNull()) {
 
@@ -106,7 +106,7 @@ QList<Entry*> FeedLoader::parseEntries(QDomDocument xmlFeed)
     case rss: case rss_rdf:
     {
         QDomNodeList itemList = xmlFeed.elementsByTagName("item");
-        for(int x = 0; x < itemList.size() - 1; x++) {
+        for(int x = 0; x < itemList.size(); x++) {
             QDomNode currentNode = itemList.item(x);
             if(currentNode.isElement() && !currentNode.isNull()) {
                 QString title = findChildElementByTag("title", currentNode.toElement()).text();

@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
         feed.cpp
         entry.h
         entry.cpp
+        feedstore.h
+        feedstore.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

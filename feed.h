@@ -8,7 +8,11 @@
 class Feed
 {
 public:
-    Feed();
+    Feed()= default;
+    ~Feed() = default;
+    Feed(const Feed &);
+    Feed &operator=(const Feed &) = default;
+
     void setEntries(QList<Entry*>);
     QList<Entry*> getEntries();
     QStringList getEntryTitles();

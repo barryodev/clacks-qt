@@ -1,8 +1,10 @@
 #include "feed.h"
 
-Feed::Feed()
+Feed::Feed(const Feed &copyFeed)
 {
-
+    this->entries = copyFeed.entries;
+    this->title = copyFeed.title;
+    this->source = copyFeed.source;
 }
 
 void Feed::setEntries(QList<Entry*> entries)

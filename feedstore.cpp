@@ -60,17 +60,6 @@ int FeedStore::updateFeed(Feed feed)
     QMutexLocker locker(&mutex);
     int indexReplaced = -1;
 
-    //
-    int rowCount = feedModel->rowCount();
-    QString matchingSource = feed.getSource().toString();
-    for(int i = 0; i < rowCount; i++) {
-        QStandardItem *item = feedModel->item(i);
-        QVariant variantWrapper = item->data(Qt::UserRole);
-        Feed currentFeed = variantWrapper.value<Feed>();
-        QString currentSource = currentFeed.getSource().toString();
-    }
-    //
-
     for(int i = 0; i < feedModel->rowCount(); i++) {
         QStandardItem *item = feedModel->item(i);
         QVariant variantWrapper = item->data(Qt::UserRole);

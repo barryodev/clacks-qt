@@ -26,6 +26,13 @@
       <item>
        <widget class="QTextBrowser" name="entryText"/>
       </item>
+      <item>
+       <widget class="QPushButton" name="openEntryInBrowser">
+        <property name="text">
+         <string>Open Entry in Browser</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>

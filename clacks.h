@@ -5,6 +5,7 @@
 #include <QStringListModel>
 #include <QString>
 #include <QStandardItemModel>
+#include <QDesktopServices>
 #include "addfeeddialog.h"
 #include "removedialog.h"
 #include "editdialog.h"
@@ -49,5 +50,6 @@ private slots:
     void on_actionAddNewFeed_triggered();
     void on_actionRemove_Feed_triggered();
     void on_actionEdit_Feed_triggered();
+    void on_openEntryInBrowser_clicked();
 };
 #endif // CLACKS_H

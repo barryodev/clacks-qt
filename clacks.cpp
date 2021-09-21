@@ -173,6 +173,7 @@ void Clacks::displayEntries(Feed feed)
 
     if(entries.count() > 1) {
         ui->entryText->setHtml(entries.at(0)->getContent());
+        ui->entryList->setCurrentIndex(entryModel->index(0,0));
     }
 }
 
@@ -207,6 +208,20 @@ void Clacks::entryClicked(const QModelIndex &index)
         Entry clickedEntry = variantWrapper.value<Entry>();
 
         ui->entryText->setHtml(clickedEntry.getContent());
+    }
+}
+
+
+void Clacks::on_openEntryInBrowser_clicked()
+{
+    if(entryModel != nullptr) {
+        QModelIndexList localSelectedIndexes = ui->entryList->selectionModel()->selectedIndexes();
+        if(localSelectedIndexes.count() == 1) {
+            QStandardItem *item = entryModel->itemFromIndex(localSelectedIndexes.first());
+            QVariant variantWrapper = item->data(Qt::UserRole);
+            Entry clickedEntry = variantWrapper.value<Entry>();
+            QDesktopServices::openUrl(clickedEntry.getSource());
+        }
     }
 }
 

@@ -16,6 +16,7 @@ public:
     void addFeed(const QModelIndex &index, QString title, Feed feed);
     void removeFeed(int index);
     int updateFeed(Feed feed);
+    void resetFeedStore();
     QString getSource(const QModelIndex &index);
     Feed getFeed(const QModelIndex &index);
     QStandardItemModel* getModel();

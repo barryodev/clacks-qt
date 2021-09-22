@@ -52,5 +52,6 @@ private slots:
     void on_actionRemove_Feed_triggered();
     void on_actionEdit_Feed_triggered();
     void on_openEntryInBrowser_clicked();
+    void on_actionRefresh_Feeds_triggered();
 };
 #endif // CLACKS_H

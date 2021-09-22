@@ -77,6 +77,13 @@ int FeedStore::updateFeed(Feed feed)
     return indexReplaced;
 }
 
+void FeedStore::resetFeedStore()
+{
+     QMutexLocker locker(&mutex);
+     feedModel->clear();
+
+}
+
 QString FeedStore::getSource(const QModelIndex &index)
 {
     QMutexLocker locker(&mutex);

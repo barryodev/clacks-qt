@@ -227,3 +227,14 @@ void Clacks::on_openEntryInBrowser_clicked()
     }
 }
 
+
+void Clacks::on_actionRefresh_Feeds_triggered()
+{
+    feedStore.resetFeedStore();
+    if(entryModel != nullptr) {
+        entryModel->clear();
+    }
+    ui->entryWebView->setHtml("");
+    loadFeedList();
+}
+

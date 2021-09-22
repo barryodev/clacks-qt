@@ -107,6 +107,7 @@
    <addaction name="actionAddNewFeed"/>
    <addaction name="actionRemove_Feed"/>
    <addaction name="actionEdit_Feed"/>
+   <addaction name="actionRefresh_Feeds"/>
   </widget>
   <action name="actionAddNewFeed">
    <property name="text">
@@ -124,6 +125,14 @@
   <action name="actionEdit_Feed">
    <property name="text">
     <string>Edit Feed</string>
+   </property>
+  </action>
+  <action name="actionRefresh_Feeds">
+   <property name="text">
+    <string>Refresh Feeds</string>
+   </property>
+   <property name="toolTip">
+    <string>Reload all feeds</string>
    </property>
   </action>
  </widget>

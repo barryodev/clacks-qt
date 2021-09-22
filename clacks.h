@@ -6,6 +6,7 @@
 #include <QString>
 #include <QStandardItemModel>
 #include <QDesktopServices>
+#include <QWebEngineView>
 #include "addfeeddialog.h"
 #include "removedialog.h"
 #include "editdialog.h"

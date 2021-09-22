@@ -19,12 +19,19 @@
      <widget class="QListView" name="feedsList"/>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="LeftLayout">
       <item>
        <widget class="QListView" name="entryList"/>
       </item>
       <item>
-       <widget class="QTextBrowser" name="entryText"/>
+       <widget class="QWebEngineView" name="entryWebView" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="openEntryInBrowser">
@@ -90,6 +97,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header location="global">qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

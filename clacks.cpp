@@ -16,9 +16,12 @@ Clacks::Clacks(QWidget *parent)
 {
     ui->setupUi(this);
     feedLoader = new FeedLoader(this);
-    ui->entryText->setReadOnly(true);
-    ui->entryText->setOpenExternalLinks(true);
-    ui->entryText->setTextInteractionFlags(ui->entryText->textInteractionFlags() | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    ui->entryWebView->setHtml("");
+    ui->entryWebView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->entryWebView->resize(500,500);
+    ui->entryWebView->show();
+
+
     databaseConnect();
     loadFeedList();
 }
@@ -172,14 +175,14 @@ void Clacks::displayEntries(Feed feed)
     connect(ui->entryList, &QListView::clicked, this, &Clacks::entryClicked);
 
     if(entries.count() > 1) {
-        ui->entryText->setHtml(entries.at(0)->getContent());
+        ui->entryWebView->setHtml(entries.at(0)->getContent());
         ui->entryList->setCurrentIndex(entryModel->index(0,0));
     }
 }
 
 void Clacks::on_feedsList_clicked(const QModelIndex &index)
 {
-    ui->entryText->setHtml("");
+    ui->entryWebView->setHtml("");
     Feed feed = feedStore.getFeed(index);
     displayEntries(feed);
 }
@@ -206,8 +209,7 @@ void Clacks::entryClicked(const QModelIndex &index)
     if(item != nullptr) {
         QVariant variantWrapper = item->data(Qt::UserRole);
         Entry clickedEntry = variantWrapper.value<Entry>();
-
-        ui->entryText->setHtml(clickedEntry.getContent());
+        ui->entryWebView->setHtml(clickedEntry.getContent());
     }
 }
 

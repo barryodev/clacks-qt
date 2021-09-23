@@ -17,6 +17,12 @@
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QListView" name="feedsList">
+      <property name="minimumSize">
+       <size>
+        <width>230</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>230</width>
@@ -34,6 +40,12 @@
      <layout class="QVBoxLayout" name="LeftLayout">
       <item>
        <widget class="QListView" name="entryList">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>200</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>

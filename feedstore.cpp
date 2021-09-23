@@ -69,8 +69,9 @@ int FeedStore::updateFeed(Feed feed)
             QVariant variantWrapper = QVariant::fromValue(feed);
             newItem->setData(variantWrapper, Qt::UserRole);
             feedModel->setItem(i, newItem);
-            indexReplaced = i;
-            break;
+            if(indexReplaced == -1) {
+                indexReplaced = i;
+            }
         }
     }
 
